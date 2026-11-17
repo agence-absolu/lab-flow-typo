@@ -130,7 +130,7 @@ function layout() {
 // --- Chorégraphie ---------------------------------------------------------
 
 // Tout est porté par une seule timeline, sans état calculé image par image :
-// on peut donc la rejouer, la mettre en pause ou la parcourir (GSDevTools).
+// on peut donc la rejouer ou la mettre en pause.
 const hero = { a: HERO_START[0], b: HERO_START[1], c: HERO_START[2] };
 const heroKeys = ['a', 'b', 'c'];
 
@@ -243,12 +243,4 @@ if (reduceMotion) {
   tl.progress(1); // directement le titre posé, déformation au curseur active
 } else {
   tl.play();
-}
-
-// Outil de pilotage de la timeline, uniquement en développement (absent du build).
-if (import.meta.env.DEV) {
-  document.documentElement.classList.add('has-devtools'); // remonte le bouton au-dessus de la barre
-  const { GSDevTools } = await import('gsap/GSDevTools');
-  gsap.registerPlugin(GSDevTools);
-  GSDevTools.create({ animation: tl, css: { zIndex: 10 } });
 }

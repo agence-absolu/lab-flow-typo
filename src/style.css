@@ -52,11 +52,6 @@ body {
   transition: opacity 0.4s;
 }
 
-/* En dev, la barre GSDevTools occupe le bas de l'écran. */
-.has-devtools .FlowTypo-replay {
-  bottom: 4.5rem;
-}
-
 /* Sticker sous le titre (ruban Corsica Ferries détouré de l'exemple fourni) :
    position et largeur posées par main.js (layout), apparition par la
    timeline. L'ombre est dans l'image. */

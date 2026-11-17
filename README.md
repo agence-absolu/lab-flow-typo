@@ -27,8 +27,12 @@ aucune configuration de son côté.
 ### 1. Le dépôt
 
 ```bash
-gh repo create agence-absolu/lab-flow-typo --public --source=. --push
+gh repo create agence-absolu/lab-flow-typo --public --source=. --remote=origin
 ```
+
+Sans `--push` : la démo contient la marque d'un client et doit être protégée
+par mot de passe (étape 2) **avant** le premier push, qui la publierait sinon
+en accès libre.
 
 **Public, obligatoirement** : les secrets SSH sont définis au niveau de
 l'organisation `agence-absolu`, et GitHub ne les partage qu'avec les dépôts
@@ -50,6 +54,16 @@ Rien à créer dans le dépôt : le workflow lit ceux de l'organisation
 Sans le dernier, le workflow relève l'empreinte du serveur au premier contact
 et la croit sur parole. Un secret de dépôt du même nom, s'il en existe un,
 prime sur celui de l'organisation.
+
+**Mot de passe.** Un secret `LAB_PAGE_PASSWORD` créé dans le dépôt (pas dans
+l'organisation) protège la démo : le déploiement en dépose l'empreinte scrypt
+dans `.access`, et le hub demande alors identifiant (libre) et mot de passe
+avant de servir quoi que ce soit. Le mot de passe n'apparaît ni dans le code
+ni sur le serveur. Sans ce secret, la démo est publique.
+
+```bash
+gh secret set LAB_PAGE_PASSWORD   # saisie masquée
+```
 
 Pourquoi un mot de passe et pas une clé : chez Infomaniak, l'authentification
 par clé n'est pas disponible sur un site Node.js et le port FTP est filtré.
