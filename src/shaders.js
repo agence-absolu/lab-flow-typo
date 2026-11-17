@@ -19,7 +19,7 @@ export const fragmentShader = /* glsl */ `
   uniform float uIntro;       // 0 → 1 : apparition
   uniform float uWave;        // amplitude de la vague
   uniform float uFocus;       // 0 → 1 : les lignes hors titre s'effacent
-  uniform float uWhite;       // 0 → 1 : le titre passe du jaune au blanc
+  uniform float uWhite;       // 0 → 1 : les lignes du titre passent du jaune au blanc
   uniform float uScroll;      // horloge de défilement des lignes hors titre
   uniform float uInteract;    // 0 → 1 : déformation au curseur active
   uniform float uHover;       // pointeur présent sur le canvas
@@ -84,7 +84,7 @@ export const fragmentShader = /* glsl */ `
   // dessinait des traits horizontaux. On lui fournit donc les vraies pentes.
   float band(sampler2D tex, vec2 p, vec2 dpx, vec2 dpy, float yl, float g, float i,
              float top, float h, float stripW, float inkStart,
-             float speed, float heroOff, float heroRep) {
+             float speed, float heroOff, float heroRep, inout float titleA) {
     float vc = (yl - top) / h; // 0 = haut des capitales, 1 = ligne de base
     float inside = step(-uMargin, vc) * step(vc, 1.0 + uMargin);
 
@@ -101,7 +101,9 @@ export const fragmentShader = /* glsl */ `
     vec2 k = vec2(1.0 / stripW, 1.0 / (h * (1.0 + 2.0 * uMargin)));
     float a = textureGrad(tex, uv, dpx * k, dpy * k).a * inside;
     // Seule la répétition centrale des lignes du titre survit au fondu.
+    // Ces mêmes répétitions sont les seules à blanchir (titleA).
     bool isTitle = g == 0.0 && floor(uv.x) == heroRep;
+    if (isTitle) titleA = max(titleA, a);
     return isTitle ? a : a * (1.0 - uFocus);
   }
 
@@ -149,12 +151,15 @@ export const fragmentShader = /* glsl */ `
     vec2 dpy = dFdy(p);
 
     float a = 0.0;
-    a = max(a, band(tStrip0, p, dpx, dpy, yl, g, 0.0, 0.5 * uGap,                  uH.x, uStripW.x, uInkStart.x, uSpeed.x, uHeroOff.x, uHeroRep.x));
-    a = max(a, band(tStrip1, p, dpx, dpy, yl, g, 1.0, uH.x + 1.5 * uGap,           uH.y, uStripW.y, uInkStart.y, uSpeed.y, uHeroOff.y, uHeroRep.y));
-    a = max(a, band(tStrip2, p, dpx, dpy, yl, g, 2.0, uH.x + uH.y + 2.5 * uGap,    uH.z, uStripW.z, uInkStart.z, uSpeed.z, uHeroOff.z, uHeroRep.z));
+    float titleA = 0.0; // part de l'encre qui appartient au titre
+    a = max(a, band(tStrip0, p, dpx, dpy, yl, g, 0.0, 0.5 * uGap,                  uH.x, uStripW.x, uInkStart.x, uSpeed.x, uHeroOff.x, uHeroRep.x, titleA));
+    a = max(a, band(tStrip1, p, dpx, dpy, yl, g, 1.0, uH.x + 1.5 * uGap,           uH.y, uStripW.y, uInkStart.y, uSpeed.y, uHeroOff.y, uHeroRep.y, titleA));
+    a = max(a, band(tStrip2, p, dpx, dpy, yl, g, 2.0, uH.x + uH.y + 2.5 * uGap,    uH.z, uStripW.z, uInkStart.z, uSpeed.z, uHeroOff.z, uHeroRep.z, titleA));
 
-    vec3 ink = mix(YELLOW, vec3(1.0), uWhite);
-    ink = mix(ink, vec3(1.0, 0.97, 0.75), f * 0.35 * (1.0 - uWhite));
+    // Seul le titre blanchit : les clones restent jaunes à côté de lui.
+    float white = uWhite * (a > 0.0 ? titleA / a : 0.0);
+    vec3 ink = mix(YELLOW, vec3(1.0), white);
+    ink = mix(ink, vec3(1.0, 0.97, 0.75), f * 0.35 * (1.0 - white));
     vec3 col = mix(bg, ink, a * uIntro);
 
     // Vignettage + grain léger pour casser les aplats.

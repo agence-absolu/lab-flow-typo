@@ -18,6 +18,7 @@ const BLOCK_HEIGHT = 0.46;          // hauteur du titre, en fraction du viewport
 const RUN = 2;                      // durée de la course, du départ à l'arrêt (s)
 const TRAVEL = 5;                   // distance parcourue (× SPEEDS, en répétitions)
 const RUN_EASE = 'power3.out';      // départ très vif, freinage concentré en début de course
+const WHITE_AT = 0.35;              // passage du titre au blanc, en fraction de la course
 const TITLE_Y = 0.06;               // remontée du titre (fraction du viewport) pour le sticker
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -155,11 +156,20 @@ function buildTimeline() {
     uniforms.uHeroRep.value.setComponent(i, target); // la répétition arrêtée au centre
   });
 
-  // Dès l'arrêt : les clones s'effacent vite, le titre passe au blanc, le
-  // sticker arrive.
+  // Comme sur la vidéo de référence : les mots du titre passent au blanc
+  // pendant le freinage, juste avant de s'immobiliser…
+  tl.fromTo(uniforms.uWhite, { value: 0 }, { value: 1, duration: 0.3, ease: 'power1.out' }, RUN * WHITE_AT);
+
+  // … et à l'arrêt : retour au jaune (état final), les clones s'effacent
+  // vite, le sticker arrive.
   tl.addLabel('title', RUN);
   tl.fromTo(uniforms.uFocus, { value: 0 }, { value: 1, duration: 0.25, ease: 'power1.out' }, 'title');
-  tl.fromTo(uniforms.uWhite, { value: 0 }, { value: 1, duration: 0.35, ease: 'power2.out' }, 'title');
+  tl.fromTo(
+    uniforms.uWhite,
+    { value: 1 },
+    { value: 0, duration: 0.3, ease: 'power2.out', immediateRender: false }, // sinon il écraserait le 0 de départ
+    'title',
+  );
   tl.fromTo(
     sticker,
     // L'image est déjà inclinée : le sticker se pose à 0°.
