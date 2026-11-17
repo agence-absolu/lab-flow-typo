@@ -10,5 +10,4 @@ const base = process.env.BASE_PATH || `/${name}/`;
 
 export default defineConfig({
   base,
-  server: { open: true },
 });
