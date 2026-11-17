@@ -1,0 +1,80 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  background: #1b1d1c;
+  height: 100%;
+  overflow: hidden;
+}
+
+.FlowTypo {
+  height: 100%;
+  position: relative;
+}
+
+.FlowTypo-canvas {
+  display: block;
+  height: 100%;
+  inset: 0;
+  position: absolute;
+  touch-action: none;
+  width: 100%;
+}
+
+/* Titre réel pour les lecteurs d'écran : le canvas ne dit rien. */
+.FlowTypo-title {
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.FlowTypo-replay {
+  background: #ffed00;
+  border: 0;
+  border-radius: 999px;
+  bottom: 1.5rem;
+  color: #1b1d1c;
+  cursor: pointer;
+  font: 1rem / 1 'Anton', sans-serif;
+  letter-spacing: 0.04em;
+  opacity: 0;
+  padding: 0.75rem 1.5rem;
+  position: absolute;
+  right: 1.5rem;
+  text-transform: uppercase;
+  transition: opacity 0.4s;
+}
+
+/* En dev, la barre GSDevTools occupe le bas de l'écran. */
+.has-devtools .FlowTypo-replay {
+  bottom: 4.5rem;
+}
+
+/* Sticker sous le titre (ruban Corsica Ferries détouré de l'exemple fourni) :
+   position et largeur posées par main.js (layout), apparition par la
+   timeline. L'ombre est dans l'image. */
+.FlowTypo-sticker {
+  height: auto;
+  left: 50%;
+  pointer-events: none;
+  position: absolute;
+  top: var(--sticker-top, 70%);
+  visibility: hidden;
+  width: var(--sticker-width, 20rem);
+}
+
+.FlowTypo-replay.is-visible {
+  opacity: 1;
+}
+
+.FlowTypo-replay:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
