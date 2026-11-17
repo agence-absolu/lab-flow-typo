@@ -126,12 +126,12 @@ export const fragmentShader = /* glsl */ `
     float w = uWave;
     p.y -= uTitleY; // tout le pavage (et la vague) se centre sur le titre
     vec2 z = p * 1.75;
-    // Calée sur la vidéo : au centre, le titre monte légèrement vers la droite
-    // et ses lettres grandissent de gauche à droite ; plus loin, ces mêmes
-    // termes deviennent de grandes ondulations. Tout est nul au centre de
-    // l'écran, qui reste donc le centre du titre.
-    z.y *= 1.0 - w * 0.25 * sin(z.x * 1.3);                     // lettres qui grandissent
-    z.y -= w * 0.05 * sin(z.x * 2.1 + z.y * 0.6);               // pente douce, vague ample
+    // Calée sur les captures : les lettres gardent toutes la même taille, ce
+    // sont les lignes qui se décalent verticalement. Au centre, le titre monte
+    // vers la droite (fûts verticaux, haut et bas des lignes inclinés) ; plus
+    // loin, cette pente devient une grande ondulation. Tout est nul au centre
+    // de l'écran, qui reste donc le centre du titre.
+    z.y -= w * 0.095 * sin(z.x * 2.1 + z.y * 0.6);              // pente du titre, vague ample
     z.y -= w * 0.015 * (sin(z.x * 4.3 + 1.7) - sin(1.7));       // petite ondulation
     z.x += w * 0.012 * sin(z.y * 3.1);                          // léger décalage des lignes
     p = z / 1.75;
